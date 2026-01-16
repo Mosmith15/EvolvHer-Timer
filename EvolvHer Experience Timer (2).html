@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolvHer™ Experience Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #3d2f42 0%, #2b2225 100%);
+            color: #f7f5f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 2px solid #b89a6e;
+            border-radius: 20px;
+            padding: 60px 50px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            color: #d2a86e;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-display {
+            font-size: 120px;
+            font-weight: 300;
+            color: #d2a86e;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 8px;
+            line-height: 1;
+        }
+
+        .activity-label {
+            font-size: 16px;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+            min-height: 24px;
+            font-style: italic;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: #b89a6e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #b89a6e;
+            border-radius: 8px;
+            color: #f7f5f2;
+            font-size: 14px;
+            font-family: 'Lora', serif;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 10px rgba(210, 168, 110, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 14px 28px;
+            border: 2px solid #b89a6e;
+            border-radius: 8px;
+            background: transparent;
+            color: #d2a86e;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Lora', serif;
+            min-width: 100px;
+        }
+
+        button:hover {
+            background: rgba(210, 168, 110, 0.15);
+            box-shadow: 0 0 15px rgba(210, 168, 110, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.active {
+            background: #b89a6e;
+            color: #3d2f42;
+            box-shadow: 0 0 20px rgba(210, 168, 110, 0.5);
+        }
+
+        button.pause {
+            background: rgba(197, 95, 126, 0.2);
+            border-color: #c95f7e;
+            color: #f2a1b8;
+        }
+
+        button.pause:hover {
+            background: rgba(197, 95, 126, 0.3);
+        }
+
+        button.reset {
+            background: rgba(139, 115, 85, 0.2);
+            border-color: #8b7355;
+            color: #d4a79e;
+        }
+
+        button.reset:hover {
+            background: rgba(139, 115, 85, 0.3);
+        }
+
+        .progress-ring {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.1s ease;
+            transform-origin: 50% 50%;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 30px;
+            }
+
+            .timer-display {
+                font-size: 80px;
+                letter-spacing: 4px;
+            }
+
+            .title {
+                font-size: 22px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 12px;
+                min-width: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">EvolvHer™</div>
+        <div class="subtitle">Experience Timer</div>
+
+        <div class="activity-label" id="activityLabel"></div>
+
+        <svg class="progress-ring" width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(184, 154, 110, 0.2)" stroke-width="8"></circle>
+            <circle class="progress-ring-circle" cx="100" cy="100" r="90" fill="none" stroke="#d2a86e" stroke-width="8" stroke-dasharray="565.48" stroke-dashoffset="565.48"></circle>
+        </svg>
+
+        <div class="timer-display" id="timerDisplay">05:00</div>
+
+        <div class="input-group">
+            <label class="input-label">Set Time (minutes:seconds)</label>
+            <div class="input-row">
+                <input type="number" id="minutesInput" placeholder="5" min="0" max="99" value="5">
+                <span style="color: #b89a6e; font-size: 20px;">:</span>
+                <input type="number" id="secondsInput" placeholder="00" min="0" max="59" value="0">
+            </div>
+            <input type="text" id="activityInput" placeholder="Experience name (optional)" style="width: 100%;">
+        </div>
+
+        <div class="button-group">
+            <button id="startBtn" class="active">Start</button>
+            <button id="pauseBtn" class="pause">Pause</button>
+            <button id="resetBtn" class="reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let totalSeconds = 300; // 5 minutes default
+        let remainingSeconds = 300;
+        let isRunning = false;
+        let timerInterval = null;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const activityLabel = document.getElementById('activityLabel');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        const activityInput = document.getElementById('activityInput');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressCircle = document.querySelector('.progress-ring-circle');
+
+        function updateDisplay() {
+            const mins = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            updateProgressRing();
+
+            if (remainingSeconds === 0 && isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+                playNotification();
+            }
+        }
+
+        function updateProgressRing() {
+            const circumference = 565.48; // 2 * π * 90
+            const progress = remainingSeconds / totalSeconds;
+            const offset = circumference * (1 - progress);
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function playNotification() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                const mins = parseInt(minutesInput.value) || 0;
+                const secs = parseInt(secondsInput.value) || 0;
+                totalSeconds = mins * 60 + secs;
+
+                if (remainingSeconds === totalSeconds || remainingSeconds === 0) {
+                    remainingSeconds = totalSeconds;
+                }
+
+                if (totalSeconds > 0) {
+                    isRunning = true;
+                    startBtn.classList.add('active');
+                    pauseBtn.classList.remove('active');
+
+                    const activityName = activityInput.value.trim();
+                    if (activityName) {
+                        activityLabel.textContent = activityName;
+                    }
+
+                    timerInterval = setInterval(() => {
+                        remainingSeconds--;
+                        updateDisplay();
+                    }, 1000);
+                    updateDisplay();
+                }
+            }
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+                startBtn.classList.remove('active');
+                pauseBtn.classList.add('active');
+            } else if (remainingSeconds < totalSeconds) {
+                isRunning = true;
+                startBtn.classList.add('active');
+                pauseBtn.classList.remove('active');
+                timerInterval = setInterval(() => {
+                    remainingSeconds--;
+                    updateDisplay();
+                }, 1000);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            clearInterval(timerInterval);
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            remainingSeconds = totalSeconds;
+            activityLabel.textContent = '';
+            updateDisplay();
+            startBtn.classList.remove('active');
+            pauseBtn.classList.remove('active');
+        });
+
+        minutesInput.addEventListener('change', () => {
+            if (!isRunning) {
+                const mins = parseInt(minutesInput.value) || 0;
+                const secs = parseInt(secondsInput.value) || 0;
+                totalSeconds = mins * 60 + secs;
+                remainingSeconds = totalSeconds;
+                updateDisplay();
+            }
+        });
+
+        secondsInput.addEventListener('change', () => {
+            if (!isRunning) {
+                const mins = parseInt(minutesInput.value) || 0;
+                const secs = parseInt(secondsInput.value) || 0;
+                totalSeconds = mins * 60 + secs;
+                remainingSeconds = totalSeconds;
+                updateDisplay();
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
